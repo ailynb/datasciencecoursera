@@ -103,3 +103,21 @@ cacheSolve <- function(x, ...) {
         x$setsolve(m)
         m
 }
+
+#-----------------------------------------------------------------------------------------
+# TEST 1
+#-----------------------------------------------------------------------------------------
+#Bellow is a test cases to check if inversion works, using matrix m1
+m1 <- matrix(c(1/2, -1/4, -1, 3/4), 2, 2)
+#identity matrix for reference
+identityMatrix <- matrix(c(1,0,0,1),2,2)
+
+#cache m1, assign to a
+a <- makeCacheMatrix(m1)
+#put a though cachesolver, assign it to b
+b <- cacheSolve(a)
+#do matrix multiplication (%*% oeprator) of m1 and inverse (stored as b) and store it as c
+c <- m1 %*% b
+
+#check if c = stored identityMatrix, if so then message appears!
+if(identical(c,identityMatrix)){message("Congrats the functions work!")}
