@@ -1,9 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
-
 # Project - Getting and Cleaning Data
 Human Activity Recognition Using Smartphones Data Set 
 
@@ -34,5 +28,5 @@ You should create one R script called run_analysis.R that does the following.
 
 ## Outputs produced
 
-* Tidy dataset file DatasetHumanActivityRecognitionUsingSmartphones.txt (tab-delimited text)
-* Codebook file codebook.md (Markdown)
+* Tidy dataset file (tab-delimited text)
+
