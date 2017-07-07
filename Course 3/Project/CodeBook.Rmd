@@ -1,0 +1,32 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+# Project - Getting and Cleaning Data
+Human Activity Recognition Using Smartphones Data Set 
+
+## CODE BOOK
+
+### PREVIOUS STEPS
+
+1. CLEAN OBJECTS FROM WORKSPACE
+rm(list=ls())
+
+2. LIBRARIES
+library(data.table)
+library(dplyr)
+library(tidyr)
+
+3. CHANGE WORKING DIRECTORY
+setwd("")
+
+4. GET DATA: Download and Unzip Data
+
+5. READ INPUTs FILES
+* Read the list of variables of each feature vector
+* Read Activity Labels 
+* Read Subject Files
+* Read Activities Files
+* Read Features Files
+
