@@ -7,3 +7,10 @@
 
 ## Course 3: Getting and Cleaning Data
 * Reading XMLs
+
+## Course 4: Exploratory Data Analysis
+* Clustering - Cases Study
+* Project 1
+* Project 2
+
+## Course 5: Reproducible Research

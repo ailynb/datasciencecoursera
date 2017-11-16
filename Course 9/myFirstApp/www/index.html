@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <div class="container-fluid">
+        <h2>Tabs!</h2>
+        <div class="row">
+            <div class="col-sm-4">
+                <form class="well">
+                    <div class="form-group shiny-input-container">
+                        <label for="box1">Enter Tab 1 Text:</label>
+                        <input id="box1" type="text" class="form-control" value="Tab 1!" />
+                    </div>
+                    <div class="form-group shiny-input-container">
+                        <label for="box2">Enter Tab 2 Text:</label>
+                        <input id="box12" type="text" class="form-control" value="Tab 2!" />
+                    </div>
+                    <div class="form-group shiny-input-container">
+                        <label for="box3">Enter Tab 3 Text:</label>
+                        <input id="box3" type="text" class="form-control" value="Tab 3!" />
+                    </div>
+                </form>
+            </div>
+           <div class="col-sm-8">
+               <div class="tabbale tabs-above">
+                   <ul class="nav nav-tabs">
+                       <li class="active">
+                           <a href="#tab-8789-1" data-toggle="tab" data-value="Tab 1">Tab 1</a>
+                       </li>
+                       <li class="active">
+                           <a href="#tab-8789-2" data-toggle="tab" data-value="Tab 2">Tab 2</a>
+                       </li>
+                       <li class="active">
+                           <a href="#tab-8789-3" data-toggle="tab" data-value="Tab 3">Tab 3</a>
+                       </li>
+                   </ul>
+                   <div class="tab-content">
+                       <div class="tab-pane active" data-value="Tab 1" id="tab-8795-1">
+                           <br/>
+                           <div id="out1" class="shiny-text-output"></div>
+                       </div>
+                       <div class="tab-pane" data-value="Tab 2" id="tab-8795-2">
+                           <br/>
+                           <div id="out2" class="shiny-text-output"></div>
+                       </div>
+                       <div class="tab-pane" data-value="Tab 3" id="tab-8795-3">
+                           <br/>
+                           <div id="out3" class="shiny-text-output"></div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+            
+        </div>
+    </div>
+</body>
+
+</html>

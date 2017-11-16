@@ -1,0 +1,99 @@
+---
+title: "Project: Statistical Inference - Part II "
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE }
+
+library(ggplot2)
+
+set.seed(1)
+
+# --------------------------------------------------------------------------------------------------
+# WORKING DIRECTORY
+# --------------------------------------------------------------------------------------------------
+setwd("C:/Users/ABC/Cursos/Data Scientists - Johns Hopkins University/WorkingDirectory_Curso/datasciencecoursera_repository/Course 6/Project_1/")
+```
+
+## Part 2: Basic Inferential Data Analysis Instructions
+Now in the second portion of the project, we're going to analyze the ToothGrowth data in the R datasets package.
+1. Load the ToothGrowth data and perform some basic exploratory data analyses
+2. Provide a basic summary of the data.
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+4. State your conclusions and the assumptions needed for your conclusions.
+
+
+### 1. Load the ToothGrowth data and perform some basic exploratory data analyses
+```{r }
+data(ToothGrowth)
+str(ToothGrowth)
+# To find all unique values for each causal factor
+unique(ToothGrowth$supp)
+unique(ToothGrowth$dose)
+# Comparision between Tooth length and Vitamin C dose
+g1 <- ggplot(aes(x=dose, y = len), data = ToothGrowth) + geom_point(aes(color = supp)) +
+    theme_bw() + theme(legend.position = "top")
+# Comparison between delivery methods and tooth length
+g2 <- ggplot(aes(x = supp, y = len), data = ToothGrowth) + 
+    geom_boxplot(aes(fill = supp))+
+    theme_bw() + theme(legend.position = "none")
+# Comparison between delivery methods at each dose level
+g3 <- ggplot(aes(x = supp, y = len), data = ToothGrowth) + 
+    geom_boxplot(aes(fill = supp)) + facet_wrap(~ dose)+
+    theme_bw() + theme(legend.position = "none")
+# Comparison between Vitamin C dose levels and tooth length
+g4 <- ggplot(aes(x = factor(dose), y = len), data = ToothGrowth) + 
+    geom_boxplot(aes(fill = factor(dose))) + theme(legend.position = "none")
+# You might have produced myPlotList using instead lapply, mc.lapply, plyr::dlply, etc 
+myPlotList = list(g1, g2, g3, g4)
+library("gridExtra")
+do.call(grid.arrange,  myPlotList)
+
+```
+
+
+### 2. Provide a basic summary of the data.
+```{r }
+summary(ToothGrowth)
+by(ToothGrowth$len, INDICES = list(ToothGrowth$supp, ToothGrowth$dose), summary)
+length(ToothGrowth$len)
+by(ToothGrowth$len, INDICES = list(ToothGrowth$supp, ToothGrowth$dose), length)
+```
+
+### 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+```{r }
+t.test(len ~ supp, paired = F, var.equal = F, data = ToothGrowth)
+```
+A confidence interval of [-0.171, 7.571] does not allow us to reject the null hypothesis (that there is no correlation between delivery method and tooth length).
+```{r }
+# Analysis of the data for correlation between the dose level and change in tooth growth
+dose1 <- subset(ToothGrowth, dose %in% c(0.5, 1.0))
+dose2 <- subset(ToothGrowth, dose %in% c(0.5, 2.0))
+dose3 <- subset(ToothGrowth, dose %in% c(1.0, 2.0))
+t.test(len ~ dose, paired = F, var.equal = F, data = dose1)
+t.test(len ~ dose, paired = F, var.equal = F, data = dose2)
+t.test(len ~ dose, paired = F, var.equal = F, data = dose3)
+```
+Confidence interval is -11.98 for Doses 0.5 Confidence interval is -6.276 for Doses 1.0 Confidence interval is -18.16 for Doses 0.5 Confidence interval is -12.83 for Doses 2.0 Confidence interval is -8.996 for Doses 1.0 Confidence interval is -3.734 for Doses 2.0
+
+Above data indicates the rejection of the null hypothesis and a confirm that there is a significant correlation between tooth length and dose levels.
+
+```{r }
+# Analysis of the correlation between dose level and impact in tooth growth
+Tooth.dose5 <- subset(ToothGrowth, dose == 0.5)
+Tooth.dose1 <- subset(ToothGrowth, dose == 1.0)
+Tooth.dose2 <- subset(ToothGrowth, dose == 2.0)
+t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose5)
+t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose1)
+t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose2)
+```
+
+## Summary
+The confidence intervals for dose levels 0.5mg and 1.0mg([1.72, 8,78] within 0.5mg, [2.80, 9.06] within 1.0mg) allow for the rejection of the null hypothesis and a confirmation that there is a significant correlation between tooth length and dose levels. However, the confidence interval for dose level 2.0[-3.80, 3.64] is not enough to reject the null hypothesis.
+
+## Conclusions and the Assumptions
+With the values obtained it can be assumed that there is a different in the growth of the tooth while the doses are larger. By looking at the boxplot and the results, it can also be said that there is no other factor that will affect the growing process (it will depend greatly on the dose), in other words, the delivery methods are independent of the dose size.

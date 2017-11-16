@@ -1,0 +1,136 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+    html_document:
+        keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries
+```{r, echo=TRUE}
+library(ggplot2)
+library(lubridate,warn.conflicts = FALSE)
+```
+
+
+## Loading and preprocessing the data
+
+```{r, echo=TRUE}
+
+# CLEAN OBJECTS FROM WORKSPACE
+rm(list=ls())
+
+# WORKING DIRECTORY
+setwd("C:/Users/ABC/Cursos/Data Scientists - Johns Hopkins University/WorkingDirectory_Curso/datasciencecoursera_repository/Course 5/Project_1/")
+
+# LOAD DATA
+unzip("activity.zip")
+df_activity <- read.csv("activity.csv", sep=",", stringsAsFactors = FALSE, header = TRUE)
+
+# TRANSFORM TO DATE
+df_activity$date <- as.factor(as.Date(df_activity$date, format = "%Y-%m-%d"))
+
+```
+
+
+
+## What is mean total number of steps taken per day?
+
+```{r, echo=TRUE}
+## HISTOGRAM OF TOTAL NUMBER OF STEPS TAKEN EACH DAY 
+total_steps <- with(df_activity, tapply(steps, date, FUN = sum, na.rm = TRUE))
+qplot(total_steps, binwidth = 1000, ylab = "Frecuency", xlab="Number of steps per day")
+
+
+## MEAN AND MEDIAM OF THE TOTAL NUMBER OF STEPS TAKEN PER DAY
+mean(total_steps)
+median(total_steps) 
+
+```  
+
+
+```{r, echo=TRUE}
+## BARPLOT OF TOTAL OF STEPS PER DAY
+total_steps <- aggregate(steps ~ date, df_activity[!is.na(df_activity$steps),], sum)
+ggplot(data=total_steps, aes(x=date,y=steps)) + 
+    geom_bar(stat="identity") + 
+    ggtitle("Total steps per day") + xlab(" ") + ylab("Steps") +
+    theme_bw() +
+    theme(
+        plot.title = element_text(size=12,lineheight=.7, face="bold", hjust = 0.5, vjust = -1.0, 
+                                  color= "black"),
+        axis.text.x = element_text(size=7, color= "black", angle=90, hjust = 1),
+        legend.position="none"
+    )  
+
+```
+
+
+## What is the average daily activity pattern?
+
+```{r, echo=TRUE}
+## AVERAGE DAILY OF STEPS TAKEN EACH INTERVAL
+daily_average <- aggregate(steps ~ interval, df_activity[!is.na(df_activity$steps),], mean)
+
+ggplot(daily_average, aes(x=interval, y=steps)) + geom_line() +
+    xlab("5-minute interval") + ylab("Average number of steps") + 
+    ggtitle("Time Series Plot")
+
+```
+
+```{r, echo=TRUE}
+max_interval <- daily_average[which.max(daily_average$step),]
+```
+
+The **5-minute interval that contains the maximum number of steps** is: `r max_interval$interval` with `r max_interval$steps` mean of steps
+
+
+
+## Imputing missing values
+
+```{r, echo=TRUE}
+## TOTAL OF MISSING VALUES
+summary(df_activity)
+table(is.na(df_activity$steps))
+total_na <- sum(is.na(df_activity$steps))
+
+## FILLING IN ALL OF THE MISSING VALUES
+# - Strategy: reemplace NA by the mean for that 5 minute interval
+df_activity_withoutNA <- df_activity
+intervals_na <- unique(df_activity[is.na(df_activity$steps),"interval"])
+for(i in intervals_na){
+    df_activity_withoutNA[is.na(df_activity_withoutNA$steps) & df_activity_withoutNA$interval==i, ]$steps <- daily_average[daily_average$interval==i,]$steps
+}
+
+## HISTOGRAM OF TOTAL NUMBER OF STEPS TAKEN EACH DAY 
+total_steps <- with(df_activity_withoutNA, tapply(steps, date, FUN = sum, na.rm = TRUE))
+qplot(total_steps, binwidth = 1000, ylab = "Frecuency", xlab="Number of steps per day")
+
+## MEAN AND MEDIAM OF THE TOTAL NUMBER OF STEPS TAKEN PER DAY
+mean(total_steps)
+median(total_steps) 
+
+```  
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
+
+```{r, echo=TRUE}
+## DETERMINE IS WEEKDAY OR WEEKEND DAY
+df_activity_withoutNA$day <- "weekday"
+df_activity_withoutNA[wday(df_activity_withoutNA$date, label=TRUE) %in% c("Sun","Sat"), ]$day <- "weekend"
+table(df_activity$day)
+
+## AVERAGE DAILY OF STEPS TAKEN EACH INTERVAL
+daily_sum <- aggregate(steps ~ interval+day, df_activity_withoutNA[!is.na(df_activity_withoutNA$steps),], mean)
+
+ggplot(daily_sum, aes(x=interval, y=steps)) + 
+    geom_line() + facet_grid(day ~ .) + 
+    xlab("5-minute interval") + ylab("Average number of steps") + 
+    ggtitle("Time Series Plot")
+
+```

@@ -1,0 +1,71 @@
+---
+title: "Project: Regression Models"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE }
+# --------------------------------------------------------------------------------------------------
+# WORKING DIRECTORY
+# --------------------------------------------------------------------------------------------------
+setwd("C:/Users/ABC/Cursos/Data Scientists - Johns Hopkins University/WorkingDirectory_Curso/datasciencecoursera_repository/Course 7/")
+```
+
+## Instructions
+
+You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:
+
+- Is an automatic or manual transmission better for MPG
+- Quantify the MPG difference between automatic and manual transmissions
+
+
+### Preprocessing
+
+```{r, include=TRUE }
+# - Load dataframe
+data(mtcars)
+
+# - Analysis: Relationship between mpg and others variables
+cor(mtcars$mpg,mtcars[,-1])
+```
+
+### Question 1: Is an automatic or manual transmission better for MPG (miles per gallon)?
+
+```{r, include=TRUE }
+# - Transmission type: 0 automatic and 1 manual
+mtcars$am <- as.factor(mtcars$am)
+levels(mtcars$am) <- c("Automatic", "Manual")
+
+# - Comparison for MPG
+par(mfrow = c(1, 2), pty = "s") 
+boxplot(mtcars$mpg ~ mtcars$am, data = mtcars, outpch = 19, ylab="MPG",
+        xlab="Transmission type",main="mpg vs transmission type", col="blue")
+
+# - Statistical analysis
+t.test(mtcars$mpg~mtcars$am,conf.level=0.95)
+```
+
+The p-value is 0.001374, we may reject the null hypothesis and conclude, that automatic transmission cars have lower mpg compared with manual transmission cars
+
+
+### Question 2: Quantify the MPG difference between automatic and manual transmissions
+
+```{r, include=TRUE }
+# - Select a model
+stepmodel <- step(lm(data = mtcars, mpg ~ .),trace=0,steps=10000)
+#summary(stepmodel)
+
+# - Best Model
+model <- lm(mpg~ factor(am):wt + factor(am):qsec,data=mtcars)
+summary(model)
+par(mfrow=c(1,4))    
+plot(model)
+```
+Interpreting the results, we can see this model has a 89.5% total variance with an adjusted variance of 0.879
+
+
+## Conclusion
+The mpg is largely determined by the interplay between weight, acceleration and transmission. Given the above analysis, the first question is not really answered, and should be considered in the context of weight and acceleration speed.
