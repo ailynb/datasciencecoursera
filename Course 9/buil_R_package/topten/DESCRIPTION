@@ -1,0 +1,11 @@
+Package: topten
+Type: Package
+Title: Building a Predicting Model from Top 10 Features
+Version: 1.0.0
+Author: Roger Peng
+Maintainer: Roger Peng <yourself@somewhere.net>
+Description: Functions for building and predictiong models from selecting the top 10 predictors in a data set
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

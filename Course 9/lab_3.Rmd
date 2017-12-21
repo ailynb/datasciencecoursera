@@ -1,0 +1,33 @@
+---
+title: 'Lab 3: R Markdown Presentation & Plotly'
+author: "Ailyn"
+date: '2017-11-21'
+output:
+    ioslides_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+
+## Scatterplot
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+library(ggplot2)
+library(plotly)
+
+data(mtcars)
+
+mtcars$cyl <- as.factor(paste("cyl",mtcars$cyl))
+mtcars$am <- factor(mtcars$am, labels = c("Manual", "Automatic"))
+
+
+plot_ly(x=mtcars$wt, y=mtcars$mpg, mode="markers") %>%  
+    add_markers(color = ~mtcars$am, symbol = ~mtcars$cyl) %>%  
+    layout(title = "wt v/s mpg")
+
+
+```

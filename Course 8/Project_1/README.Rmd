@@ -1,0 +1,97 @@
+---
+title: "Machine Learning - Project: Prediction Assignment Writeup"
+output:
+html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+
+### Data
+
+The training data for this project are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+
+### Goal
+
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.
+
+
+
+# Preliminary Work
+
+An overall pseudo-random number generator seed was set at 1234 for all code. In order to reproduce the results below, the same seed should be used. Different packages were downloaded and installed, such as caret, ggplot2 and randomForest. These should also be installed in order to reproduce the results below (please see code below for ways and syntax to do so).
+
+```{r }
+# - Reproduceability
+set.seed(1234)
+
+# - Load libraries
+library(ggplot2)
+library(caret)
+library(randomForest)
+
+# - Load Data
+input_training <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"),
+                           na.strings=c("NA","#DIV/0!",""))
+input_testing <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"),
+                          na.strings=c("NA","#DIV/0!",""))
+table(input_training$classe)
+```
+The variable "classe" is a factor variable with 5 levels (Class A: Sitting, Class B: Sitting down, Class C: Standing, Class D: Standing up, Class E: walking)
+
+
+### Cleaning the input data
+```{r }
+#summary(input_training)
+
+# - Exclude variables that cannot be used for prediction: identifier, timestamp, and window data
+input_training <- input_training[, - grep("name|timestamp|window|X", colnames(input_training), value=F) ]
+
+# - Remove variables with at least 60% of NA
+cs <- colSums(sapply(input_training, is.na))
+input_training <- input_training[, (cs / nrow(input_training) < 0.6)]
+
+# - Removing zero covariates
+nzv <- nearZeroVar(input_training, saveMetrics = TRUE)
+input_training <- input_training[, !nzv$nzv ]
+```
+
+### Working with training and testing data
+```{r }
+# - Create a series of testing/training partitions
+inTrain <- createDataPartition(input_training$classe, p=0.7, list=FALSE)
+training <- input_training[inTrain,]
+testing <- input_training[-inTrain,]
+
+# - Built a Model and Predict on the testing set
+modFit <- randomForest(classe ~. , data=training)
+prediction <- predict(modFit, testing)
+confusionMatrix(prediction, testing$classe)
+
+```
+
+### Test Cases
+```{r }
+prediction <- predict(modFit, input_testing)
+prediction
+input_testing$classe <- prediction
+
+```
+
+
+
