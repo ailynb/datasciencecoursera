@@ -36,10 +36,6 @@ predict(modFit, newdata = testing)
 
 
 
-# - Load libraries
-library(ggplot2)
-library(caret)
-
 ################################################### EXAMPLE 2 ################################################### 
 # - Load data
 data(ozone, package = "ElemStatLearn")
