@@ -1,5 +1,5 @@
 ---
-title: "Machine Learning - Project: Prediction Assignment Writeup"
+title: "Machine Learning - Project: Prediction of classe"
 output:
 html_document: default
 ---
@@ -34,7 +34,7 @@ The goal of your project is to predict the manner in which they did the exercise
 
 # Preliminary Work
 
-An overall pseudo-random number generator seed was set at 1234 for all code. In order to reproduce the results below, the same seed should be used. Different packages were downloaded and installed, such as caret, ggplot2 and randomForest. These should also be installed in order to reproduce the results below (please see code below for ways and syntax to do so).
+An overall pseudo-random number generator seed was set at 1234 for all code. In order to reproduce the results below, the same seed should be used. 
 
 ```{r }
 # - Reproduceability
@@ -52,10 +52,12 @@ input_testing <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlear
                           na.strings=c("NA","#DIV/0!",""))
 table(input_training$classe)
 ```
-The variable "classe" is a factor variable with 5 levels (Class A: Sitting, Class B: Sitting down, Class C: Standing, Class D: Standing up, Class E: walking)
+The variable "classe" is a factor variable with 5 levels.
 
 
 ### Cleaning the input data
+
+We need return a clean input data for used as training data set
 ```{r }
 #summary(input_training)
 
@@ -84,12 +86,13 @@ prediction <- predict(modFit, testing)
 confusionMatrix(prediction, testing$classe)
 
 ```
+The result is a model with good prediction values.
 
 ### Test Cases
+Now is moment to use "test cases" and predict the classe
 ```{r }
 prediction <- predict(modFit, input_testing)
 prediction
-input_testing$classe <- prediction
 
 ```
 

@@ -1,0 +1,12 @@
+name: course9_project1
+title: Course9_Project1
+username:
+account: ailynb
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 253020
+bundleId: 1158578
+url: https://ailynb.shinyapps.io/course9_project1/
+when: 1514884979.88754
+asMultiple: FALSE
+asStatic: FALSE
