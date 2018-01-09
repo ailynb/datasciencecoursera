@@ -7,12 +7,11 @@
 #    http://shiny.rstudio.com/
 #
 
-# - Load libraries
-library(ggplot2)
-library(caret)
-library(randomForest)
-library(shiny)
 
+
+
+
+############################## Shiny Server ############################## 
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -20,44 +19,52 @@ shinyServer(function(input, output) {
     # - Reproduceability
     set.seed(1234)
     
-    # - Load Data
-    if(!exists("input_training")){
-        input_training <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"),
-                                   na.strings=c("NA","#DIV/0!",""))
-        input_testing <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"),
-                                  na.strings=c("NA","#DIV/0!",""))
-    }
     
-    #table(input_training$classe)
+    # Read wine data
+    while(!exists("wine_red"))
+        wine_red <- read.csv2(url("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"),
+                              dec = ".")
+    wine_red$color <- "red"
     
-    #summary(input_training)
+    while(!exists("wine_white"))
+        wine_white <- read.csv2(url("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv"),
+                                dec = ".")
+    wine_white$color <- "white"
     
-    # - Exclude variables that cannot be used for prediction: identifier, timestamp, and window data
-    input_training <- input_training[, - grep("name|timestamp|window|X", colnames(input_training), value=F) ]
+    # - Built only a dataframe taking some variables
+    wine_red <- wine_red[,c("alcohol","pH","density","volatile.acidity","quality","color")]
+    wine_white <- wine_white[,c("alcohol","pH","density","volatile.acidity","quality","color")]
+    wine <- rbind(wine_red,wine_white)
     
-    # - Remove variables with at least 60% of NA
-    cs <- colSums(sapply(input_training, is.na))
-    input_training <- input_training[, (cs / nrow(input_training) < 0.6)]
     
-    # - Removing zero covariates
-    nzv <- nearZeroVar(input_training, saveMetrics = TRUE)
-    input_training <- input_training[, !nzv$nzv ]
-    
-    # - Create a series of testing/training partitions
-    inTrain <- createDataPartition(input_training$classe, p=0.7, list=FALSE)
-    training <- input_training[inTrain,]
-    testing <- input_training[-inTrain,]
+    ###### - Predit "quality" with Regression Tree
+    # - Create a series of testing/training partitions 
+    library(caret)
+    inTrain <- createDataPartition(wine$quality, p=0.7, list=FALSE)
+    training <- wine[inTrain,]
+    testing <- wine[-inTrain,]
     
     # - Built a Model and Predict on the testing set
-    modFit <- randomForest(classe ~. , data=training)
-    prediction <- predict(modFit, testing)
-    cMatrix <- confusionMatrix(prediction, testing$classe)
+    library(rpart) #recursive and partitioning trees
+    model <- rpart(quality ~. , data = training)
     
-    prediction <- predict(modFit, input_testing)
-    input_testing$classe <- prediction
+    modelpred <- reactive({
+        test <- data.frame("alcohol"=input$alcohol , "pH"=input$pH , "density"=input$density , 
+                           "volatile.acidity"=input$volatile_acidity , "quality"=NA , 
+                           "color"=input$color , "taste" =NA  )
+        predict(model, newdata = test)
+    })
     
-    output$classe <- renderText({    
-        input_testing[input$test_case,]$classe
+    pred_MAE <- reactive({
+        mean(abs(testing$quality - modelpred()))
+    })
+    
+    output$pred1 <- renderText({
+        paste(modelpred(),"(",ifelse(modelpred() < 6, 'bad', ifelse(modelpred() == 6, 'normal', 'good')),")")
+    })
+    
+    output$pred_MAE <- renderText({
+        paste(pred_MAE()*100,"%")
     })
     
 })

@@ -1,54 +1,73 @@
 Project: Shiny Application and Reproducible Pitch
 ========================================================
 author: Ailyn
-date: 22/12/2017
+date: 09/01/2018
 autosize: true
 
-Background
+
+About the Course Project
 ========================================================
 
-Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. 
+1. Write a shiny application with associated supporting documentation. The documentation should be thought of as whatever a user will need to get started using your application.
+2. Deploy the application on Rstudio's shiny server
+3. Share the application link by pasting it into the provided text box
+4. Share your server.R and ui.R code on github
 
-In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. 
 
-More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
 
-Goal
+How to use the application
 ========================================================
 
-The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.
+Using the data provide in "UCI Machine Learning Repository": http://archive.ics.uci.edu/ml/datasets/Wine+Quality, the goal of the project is to predict the quality of wine using some variables to predict with. 
+
+
+The aplication is running on: https://ailynb.shinyapps.io/course9_project1/
+
+
+ui.R and server.R Code: https://github.com/ailynb/datasciencecoursera/tree/master/Course%209/Project_1
+
+
+Wine Quality Data Set 
+========================================================
+
+![plot of chunk unnamed-chunk-1](project_presentation-figure/unnamed-chunk-1-1.png)
+
+```
+    alcohol            pH           density       volatile.acidity
+ Min.   : 8.00   Min.   :2.720   Min.   :0.9871   Min.   :0.0800  
+ 1st Qu.: 9.50   1st Qu.:3.110   1st Qu.:0.9923   1st Qu.:0.2300  
+ Median :10.30   Median :3.210   Median :0.9949   Median :0.2900  
+ Mean   :10.49   Mean   :3.219   Mean   :0.9947   Mean   :0.3397  
+ 3rd Qu.:11.30   3rd Qu.:3.320   3rd Qu.:0.9970   3rd Qu.:0.4000  
+ Max.   :14.90   Max.   :4.010   Max.   :1.0390   Max.   :1.5800  
+    quality        color         taste     
+ Min.   :3.000   red  :1599   bad   :2384  
+ 1st Qu.:5.000   white:4898   good  :1277  
+ Median :6.000                normal:2836  
+ Mean   :5.818                             
+ 3rd Qu.:6.000                             
+ Max.   :9.000                             
+```
+
+Predit "quality" with Regression Tree
+========================================================
 
 
 ```r
-    # - Load Data
-    if(!exists("input_training")){
-        input_training <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"),
-                                   na.strings=c("NA","#DIV/0!",""))
-        input_testing <- read.csv(url("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"),
-                                  na.strings=c("NA","#DIV/0!",""))
-        
-    }
-    table(input_training$classe)
+# - Create a series of testing/training partitions 
+library(caret)
+inTrain <- createDataPartition(wine$quality, p=0.7, list=FALSE)
+training <- wine[inTrain,-7]
+testing <- wine[-inTrain,]
+
+# - Built a Model and Predict on the testing set
+library(rpart) #recursive and partitioning trees
+model <- rpart(quality ~. , data = training)
+pred <- predict(model, newdata = testing)
+MAE(testing$quality, pred)
 ```
 
 ```
-
-   A    B    C    D    E 
-5580 3797 3422 3216 3607 
+[1] 0.6006746
 ```
 
-Predict Test Cases
-========================================================
-
-1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
-
-B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
-
-Levels: A B C D E
-
-
-More information: https://github.com/ailynb/datasciencecoursera/tree/master/Course%209/Project_1
-
-Prediction Project: https://github.com/ailynb/datasciencecoursera/tree/master/Course%208/Project_1
-
-========================================================
